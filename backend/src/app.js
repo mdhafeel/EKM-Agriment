@@ -1,0 +1,68 @@
+require('dotenv').config();
+const express = require('express');
+const cors    = require('cors');
+const path    = require('path');
+const fs      = require('fs');
+const { initializeDatabase } = require('./db/schema');
+
+const app = express();
+
+// Initialize DB
+initializeDatabase();
+
+// Middleware
+app.use(cors({ origin: '*', credentials: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Serve uploaded files
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads');
+app.use('/uploads', express.static(UPLOAD_DIR));
+
+// Serve built React frontend (production — Render/deployment serves from same origin)
+const FRONTEND_DIST = process.env.FRONTEND_DIST
+  || path.join(__dirname, '../frontend-dist')           // after render build cp
+  || path.join(__dirname, '../../frontend/dist');       // local dev fallback
+
+if (fs.existsSync(FRONTEND_DIST)) {
+  app.use(express.static(FRONTEND_DIST));
+  // SPA fallback — all non-API routes return index.html
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+  });
+} else {
+  // Dev mode — frontend runs on Vite dev server
+  app.get('/', (req, res) => res.json({ status: 'API running', frontend: 'http://localhost:5173' }));
+}
+
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/dashboard', require('./routes/dashboard'));
+app.use('/api/customers', require('./routes/customers'));
+app.use('/api/suppliers', require('./routes/suppliers'));
+app.use('/api/investments', require('./routes/investments'));
+app.use('/api/payments', require('./routes/payments'));
+app.use('/api/spare-parts', require('./routes/spareParts'));
+app.use('/api/purchases', require('./routes/purchases'));
+app.use('/api/sales', require('./routes/sales'));
+app.use('/api/expenses', require('./routes/expenses'));
+app.use('/api/accounts', require('./routes/accounts'));
+app.use('/api/ledger', require('./routes/ledger'));
+app.use('/api/daily-tracking', require('./routes/dailyTracking'));
+app.use('/api/reports', require('./routes/reports'));
+app.use('/api/notifications', require('./routes/notifications'));
+app.use('/api/audit-logs', require('./routes/auditLogs'));
+app.use('/api/settings', require('./routes/settings'));
+
+// Health check
+app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+});
+
+module.exports = app;
