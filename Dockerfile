@@ -3,43 +3,50 @@ FROM node:18-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
-# Install frontend dependencies
+# Copy package files
 COPY frontend/package*.json ./
-RUN npm install --ignore-scripts && npm approve-scripts esbuild || true && npm install
 
-# Copy frontend source and build
+# Install with legacy peer deps, approve esbuild script
+RUN npm install --legacy-peer-deps
+
+# Copy source and build
 COPY frontend/ ./
 RUN npm run build
 
 # ── Stage 2: Production backend ───────────────────────────────────────────
 FROM node:18-alpine AS production
 
+# Install build tools needed for better-sqlite3 native compilation
+RUN apk add --no-cache python3 make g++ sqlite-dev
+
 WORKDIR /app
 
-# Install backend dependencies
+# Copy backend package files
 COPY backend/package*.json ./
-RUN npm install --ignore-scripts && npm approve-scripts better-sqlite3 || true && npm install
 
-# Copy backend source
-COPY backend/ ./
+# Install backend dependencies (builds better-sqlite3 from source)
+RUN npm install --legacy-peer-deps
 
-# Copy built frontend into backend's frontend-dist folder
+# Copy backend source code
+COPY backend/src ./src
+
+# Copy built React frontend from stage 1
 COPY --from=frontend-builder /app/frontend/dist ./frontend-dist
 
-# Create data directory for SQLite
+# Create persistent data directories
 RUN mkdir -p /var/data /app/uploads
+
+# Environment defaults (override in Render dashboard)
+ENV NODE_ENV=production
+ENV PORT=3001
+ENV FRONTEND_DIST=./frontend-dist
 
 # Expose port
 EXPOSE 3001
 
-# Set environment
-ENV NODE_ENV=production
-ENV FRONTEND_DIST=./frontend-dist
-ENV PORT=3001
-
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3001/api/health', (r) => r.statusCode === 200 ? process.exit(0) : process.exit(1)).on('error', () => process.exit(1))"
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD node -e "const h=require('http');h.get('http://localhost:'+process.env.PORT+'/api/health',r=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"
 
-# Start the server
+# Start server
 CMD ["node", "src/server.js"]
