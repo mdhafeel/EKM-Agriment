@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+desktop/node_modules/
+
+# Build output
+frontend/dist/
+backend/frontend-dist/
+desktop/dist-exe/
+
+# Database files (user data — not committed)
+backend/workshop.db
+backend/workshop.db-shm
+backend/workshop.db-wal
+*.db
+*.db-shm
+*.db-wal
+
+# Environment files
+.env
+.env.local
+.env.production.local
+backend/.env
+# Keep frontend/.env.production (has VITE_API_URL=/api for Render)
+
+# Uploads (user files)
+backend/uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+backend/test-*.js
+backend/healthcheck.js
+backend/reset-data.js
+backend/check-node.js
+backend/download-prebuilt.js
+backend/setup-dirs.ps1
+
+# IDE
+.vscode/
+.idea/
