@@ -21,8 +21,8 @@ app.use('/uploads', express.static(UPLOAD_DIR));
 
 // Serve built React frontend (production — Render/deployment serves from same origin)
 const FRONTEND_DIST = process.env.FRONTEND_DIST
-  || path.join(__dirname, '../frontend-dist')           // after render build cp
-  || path.join(__dirname, '../../frontend/dist');       // local dev fallback
+  ? path.resolve(process.env.FRONTEND_DIST)          // resolve to absolute if set
+  : path.join(__dirname, '../frontend-dist');          // default: backend/frontend-dist
 
 if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
