@@ -82,7 +82,7 @@ export default function Reports() {
 
     if (activeReport === 'stock') return (
       <div>
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
           {[['total_parts','Total Parts','indigo'],['out_of_stock','Out of Stock','red'],['low_stock','Low Stock','yellow']].map(([k,l,c]) => (
             <div key={k} className={`p-3 bg-${c}-50 rounded-lg text-center`}><p className="text-xs text-gray-500">{l}</p><p className={`text-xl font-bold text-${c}-600`}>{data.summary?.[k] || 0}</p></div>
           ))}
