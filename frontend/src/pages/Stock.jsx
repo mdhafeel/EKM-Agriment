@@ -137,11 +137,11 @@ export default function Stock() {
         </span>
       ),
     },
-    { key: 'min_stock_level', label: 'Min', render: v => <span className="text-xs">{v}</span> },
-    { key: 'max_stock_level', label: 'Max', render: v => <span className="text-xs">{v}</span> },
-    { key: 'purchase_price', label: 'Buy Price',  render: v => currency(v) },
-    { key: 'selling_price',  label: 'Sell Price', render: v => currency(v) },
-    { key: 'stock_value',    label: 'Value',       render: v => <span className="font-medium text-indigo-600">{currency(v)}</span> },
+    { key: 'min_stock_level', label: 'Min', render: v => <span className="text-xs">{v}</span>, hideOnMobile: true },
+    { key: 'max_stock_level', label: 'Max', render: v => <span className="text-xs">{v}</span>, hideOnMobile: true },
+    { key: 'purchase_price', label: 'Buy Price',  render: v => currency(v), hideOnMobile: true },
+    { key: 'selling_price',  label: 'Sell Price', render: v => currency(v), hideOnMobile: true },
+    { key: 'stock_value',    label: 'Value',       render: v => <span className="font-medium text-indigo-600">{currency(v)}</span>, hideOnMobile: true },
     {
       key: 'status', label: 'Status',
       render: (_, row) => {
