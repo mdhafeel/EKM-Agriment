@@ -1,20 +1,20 @@
 # ── Stage 1: Build React frontend ────────────────────────────────────────
-FROM node:18-alpine AS frontend-builder
+FROM node:22-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
 # Copy package files
 COPY frontend/package*.json ./
 
-# Install with legacy peer deps, approve esbuild script
-RUN npm install --legacy-peer-deps
+# Install — force install react-is explicitly for recharts compatibility
+RUN npm install --legacy-peer-deps && npm install react-is --legacy-peer-deps
 
 # Copy source and build
 COPY frontend/ ./
 RUN npm run build
 
 # ── Stage 2: Production backend ───────────────────────────────────────────
-FROM node:18-alpine AS production
+FROM node:22-alpine AS production
 
 # Install build tools needed for better-sqlite3 native compilation
 RUN apk add --no-cache python3 make g++ sqlite-dev
