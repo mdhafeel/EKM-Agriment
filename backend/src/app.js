@@ -7,8 +7,14 @@ const { initializeDatabase } = require('./db/schema');
 
 const app = express();
 
-// Initialize DB
-initializeDatabase();
+// Initialize DB — crash early with clear message if it fails
+try {
+  initializeDatabase();
+  console.log('Database initialized successfully');
+} catch (err) {
+  console.error('FATAL: Database initialization failed:', err.message);
+  process.exit(1);
+}
 
 // Middleware
 app.use(cors({ origin: '*', credentials: true }));
@@ -56,13 +62,21 @@ app.use('/api/notifications', require('./routes/notifications'));
 app.use('/api/audit-logs', require('./routes/auditLogs'));
 app.use('/api/settings', require('./routes/settings'));
 
-// Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+// Health check — also shows DB path and env for debugging
+app.get('/api/health', (req, res) => res.json({
+  status: 'ok',
+  timestamp: new Date().toISOString(),
+  env: process.env.NODE_ENV,
+  node: process.version,
+}));
 
-// Error handler
+// Error handler — log full error in production too
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+  console.error('SERVER ERROR:', err.stack || err.message);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal server error',
+    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
+  });
 });
 
 module.exports = app;
