@@ -24,7 +24,7 @@ export default function CustomerDetail() {
   const { customer, sales, payments, stats } = data;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <PageHeader
         title={customer.name}
         subtitle={customer.customer_code}
@@ -32,19 +32,19 @@ export default function CustomerDetail() {
       />
 
       {/* Info Card */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {customer.phone && <div className="flex items-center gap-2"><Phone size={16} className="text-gray-400" /><span className="text-sm">{customer.phone}</span></div>}
-          {customer.vehicle_number && <div className="flex items-center gap-2"><Car size={16} className="text-gray-400" /><span className="text-sm">{customer.vehicle_number} {customer.vehicle_model ? `(${customer.vehicle_model})` : ''}</span></div>}
-          {customer.address && <div className="flex items-center gap-2 col-span-2"><MapPin size={16} className="text-gray-400" /><span className="text-sm">{customer.address}</span></div>}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 sm:p-6 mb-4 sm:mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {customer.phone && <div className="flex items-center gap-2"><Phone size={16} className="text-gray-400 flex-shrink-0" /><span className="text-sm truncate">{customer.phone}</span></div>}
+          {customer.vehicle_number && <div className="flex items-center gap-2"><Car size={16} className="text-gray-400 flex-shrink-0" /><span className="text-sm truncate">{customer.vehicle_number} {customer.vehicle_model ? `(${customer.vehicle_model})` : ''}</span></div>}
+          {customer.address && <div className="flex items-center gap-2 sm:col-span-2"><MapPin size={16} className="text-gray-400 flex-shrink-0" /><span className="text-sm">{customer.address}</span></div>}
         </div>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <StatCard title="Total Billing" value={currency(stats.total_billing)} icon={IndianRupee} color="indigo" />
-        <StatCard title="Amount Paid" value={currency(stats.total_paid)} icon={Receipt} color="green" />
-        <StatCard title="Pending Balance" value={currency(stats.total_pending)} icon={Package} color="red" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <StatCard title="Total Billing"   value={currency(stats.total_billing)} />
+        <StatCard title="Amount Paid"     value={currency(stats.total_paid)} />
+        <StatCard title="Pending Balance" value={currency(stats.total_pending)} />
       </div>
 
       {/* Tabs */}
