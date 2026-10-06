@@ -25,25 +25,39 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../uploads');
 app.use('/uploads', express.static(UPLOAD_DIR));
 
-// Serve built React frontend (production — Render/deployment serves from same origin)
-const FRONTEND_DIST = process.env.FRONTEND_DIST
-  ? path.resolve(process.env.FRONTEND_DIST)          // resolve to absolute if set
-  : path.join(__dirname, '../frontend-dist');          // default: backend/frontend-dist
+// Serve built React frontend
+// Always resolve relative to this file's directory (__dirname = backend/src)
+// so it works regardless of where Node is started from
+const FRONTEND_DIST = (() => {
+  // If env var set, resolve it relative to __dirname for safety
+  if (process.env.FRONTEND_DIST) {
+    const p = path.isAbsolute(process.env.FRONTEND_DIST)
+      ? process.env.FRONTEND_DIST
+      : path.join(__dirname, '..', process.env.FRONTEND_DIST.replace(/^\.\//, ''));
+    return p;
+  }
+  // Default: backend/frontend-dist (copied by Dockerfile)
+  return path.join(__dirname, '../frontend-dist');
+})();
+
+const INDEX_HTML = path.join(FRONTEND_DIST, 'index.html');
+
+console.log(`Frontend dist: ${FRONTEND_DIST}`);
+console.log(`Index.html exists: ${fs.existsSync(INDEX_HTML)}`);
 
 if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
-  // SPA fallback — return index.html for all non-API, non-file routes
+  // SPA fallback — serve index.html for all page routes
   app.get('*', (req, res, next) => {
-    // Skip API routes and uploads
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
-    // Skip requests for static files with extensions (images, fonts, etc.)
+    // Skip static file extensions
     if (/\.\w{2,5}$/.test(req.path)) return res.status(404).send('Not found');
-    // All other routes → SPA index.html
-    res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
+    // Must use absolute path with sendFile
+    res.sendFile(INDEX_HTML);
   });
 } else {
-  // Dev mode — frontend runs on Vite dev server
-  app.get('/', (req, res) => res.json({ status: 'API running', frontend: 'http://localhost:5173' }));
+  console.warn(`WARNING: Frontend dist not found at ${FRONTEND_DIST}`);
+  app.get('/', (req, res) => res.json({ status: 'API running', note: 'Frontend not built' }));
 }
 
 // Routes
