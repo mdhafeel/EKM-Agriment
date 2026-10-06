@@ -77,7 +77,7 @@ export default function Login() {
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
-          <p className="text-center text-xs text-gray-400 mt-6">Default: admin / admin123</p>
+          <p className="text-center text-xs text-gray-400 mt-6">EKM Agrimart</p>
         </div>
       </div>
     </div>
