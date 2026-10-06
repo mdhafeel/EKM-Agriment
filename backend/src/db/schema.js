@@ -2,15 +2,33 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs   = require('fs');
 
-// In Electron: DB_PATH is set by main.js
-// On Render:   /var/data is the persistent disk mount point
-// In dev:      falls back to backend folder
-const DB_PATH = process.env.DB_PATH
-  || (process.env.RENDER ? '/var/data/workshop.db' : path.join(__dirname, '../../workshop.db'));
+// DB path priority:
+// 1. DB_PATH env var (explicit override)
+// 2. /var/data/workshop.db (Render persistent disk — only if it exists/is mounted)
+// 3. /tmp/workshop.db (fallback if disk not mounted — data resets on redeploy)
+// 4. Local dev path
+function resolveDbPath() {
+  if (process.env.DB_PATH) return process.env.DB_PATH;
+  if (process.env.RENDER) {
+    const renderDisk = '/var/data';
+    // Check if the disk is actually mounted
+    if (fs.existsSync(renderDisk)) {
+      return path.join(renderDisk, 'workshop.db');
+    }
+    // Disk not mounted — use /tmp as fallback so app still starts
+    console.warn('WARNING: /var/data not found. Using /tmp — add a disk in Render dashboard for persistence!');
+    return '/tmp/workshop.db';
+  }
+  return path.join(__dirname, '../../workshop.db');
+}
+
+const DB_PATH = resolveDbPath();
 
 // Ensure the directory exists
 const dbDir = path.dirname(DB_PATH);
 if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true });
+
+console.log(`Database path: ${DB_PATH}`);
 
 let db;
 
