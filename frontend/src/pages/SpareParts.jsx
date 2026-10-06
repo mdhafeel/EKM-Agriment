@@ -224,9 +224,9 @@ export default function SpareParts() {
     { key: 'part_name', label: 'Part Name', render: (v, row) => (<div><p className="font-medium text-gray-900">{v}</p><p className="text-xs text-gray-400">{row.part_number ? row.part_number : ''}</p></div>) },
     { key: 'category_name_resolved', label: 'Category', render: (v, row) => (<div><p className="text-sm text-gray-700">{v || '—'}</p>{row.subcategory_name_resolved && <p className="text-xs text-indigo-500 flex items-center gap-0.5"><ChevronRight size={10} />{row.subcategory_name_resolved}</p>}</div>) },
     { key: 'current_stock', label: 'Stock', render: (v, row) => (<div className="flex items-center gap-2"><span className="font-semibold">{v}</span><span className="text-xs text-gray-400">{row.unit}</span>{stockBadge(row)}</div>) },
-    { key: 'purchase_price', label: 'Buy',   render: v => currency(v) },
-    { key: 'selling_price',  label: 'Sell',  render: v => currency(v) },
-    { key: 'stock_value',    label: 'Value', render: v => <span className="font-medium text-indigo-600">{currency(v)}</span> },
+    { key: 'purchase_price', label: 'Buy',   render: v => currency(v), hideOnMobile: true },
+    { key: 'selling_price',  label: 'Sell',  render: v => currency(v), hideOnMobile: true },
+    { key: 'stock_value',    label: 'Value', render: v => <span className="font-medium text-indigo-600">{currency(v)}</span>, hideOnMobile: true },
     { key: 'actions', label: '', render: (_, row) => (
       <div className="flex items-center gap-1">
         <button onClick={() => { setAdjustModal(row); setAdjustQty(''); setAdjustNotes(''); }} className="p-1.5 text-teal-600 hover:bg-teal-50 rounded-lg" title="Adjust Stock"><Layers size={14} /></button>
