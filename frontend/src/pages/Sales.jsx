@@ -282,9 +282,9 @@ export default function Sales() {
       <div><p className="font-medium">{v}</p>{row.vehicle_number && <p className="text-xs text-gray-400">{row.vehicle_number}</p>}</div>
     )},
     { key: 'total_amount',  label: 'Total',   render: v => <span className="font-semibold">{currency(v)}</span> },
-    { key: 'paid_amount',   label: 'Paid',    render: v => <span className="text-green-600">{currency(v)}</span> },
-    { key: 'pending_amount',label: 'Pending', render: v => parseFloat(v) > 0 ? <span className="text-red-600 font-medium">{currency(v)}</span> : '—' },
-    { key: 'gross_profit',  label: 'Profit',  render: v => <span className="text-indigo-600 font-medium">{currency(v)}</span> },
+    { key: 'paid_amount',   label: 'Paid',    render: v => <span className="text-green-600">{currency(v)}</span>, hideOnMobile: true },
+    { key: 'pending_amount',label: 'Pending', render: v => parseFloat(v) > 0 ? <span className="text-red-600 font-medium">{currency(v)}</span> : '—', hideOnMobile: true },
+    { key: 'gross_profit',  label: 'Profit',  render: v => <span className="text-indigo-600 font-medium">{currency(v)}</span>, hideOnMobile: true },
     { key: 'payment_status',label: 'Status',  render: v => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_BG[v] || ''}`}>{v}</span> },
     { key: 'actions', label: '', render: (_, row) => (
       <div className="flex items-center gap-1">
@@ -326,16 +326,16 @@ export default function Sales() {
     return (
       <div ref={invoicePrintRef} className="bg-white">
         {/* Header */}
-        <div className="flex justify-between items-start mb-6 pb-5 border-b-2 border-indigo-600">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 pb-5 border-b-2 border-indigo-600">
           <div>
-            <h2 className="text-2xl font-bold text-indigo-700">{biz.business_name || 'Auto Workshop'}</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-indigo-700">{biz.business_name || 'Auto Workshop'}</h2>
             {biz.business_address && <p className="text-sm text-gray-500 mt-1">{biz.business_address}</p>}
             {biz.business_phone   && <p className="text-sm text-gray-500">📞 {biz.business_phone}</p>}
             {biz.business_email   && <p className="text-sm text-gray-500">✉ {biz.business_email}</p>}
             {biz.business_gst     && <p className="text-sm text-gray-500 font-medium">GST: {biz.business_gst}</p>}
           </div>
-          <div className="text-right">
-            <p className="text-3xl font-bold text-indigo-600 tracking-wider">INVOICE</p>
+          <div className="sm:text-right">
+            <p className="text-2xl sm:text-3xl font-bold text-indigo-600 tracking-wider">INVOICE</p>
             <p className="text-base font-mono font-semibold text-gray-800 mt-1">#{inv.invoice_no}</p>
             <p className="text-sm text-gray-500">Date: <strong>{date(inv.date)}</strong></p>
             <span className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-bold uppercase ${
@@ -347,7 +347,7 @@ export default function Sales() {
         </div>
 
         {/* Bill To + Vehicle */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           <div className="bg-indigo-50 rounded-lg p-4">
             <p className="text-xs font-bold text-indigo-600 uppercase tracking-wide mb-2">Bill To</p>
             <p className="font-bold text-gray-900 text-base">{inv.customer_name}</p>
@@ -362,8 +362,9 @@ export default function Sales() {
           )}
         </div>
 
-        {/* Items */}
-        <table className="w-full text-sm mb-6">
+        {/* Items — scrollable on mobile */}
+        <div className="overflow-x-auto -mx-1">
+        <table className="w-full text-sm mb-6 min-w-[380px]">
           <thead>
             <tr className="bg-indigo-600 text-white">
               <th className="text-left px-3 py-2.5 rounded-tl-lg font-semibold">#</th>
@@ -393,9 +394,11 @@ export default function Sales() {
           </tbody>
         </table>
 
+        </div>{/* end overflow-x-auto */}
+
         {/* Totals */}
         <div className="flex justify-end mb-6">
-          <div className="w-72 space-y-1">
+          <div className="w-full max-w-xs space-y-1">
             <div className="flex justify-between text-sm py-1">
               <span className="text-gray-500">Subtotal</span>
               <span className="font-medium">{currency(inv.subtotal)}</span>
