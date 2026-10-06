@@ -198,9 +198,9 @@ export default function Purchases() {
     { key: 'purchase_no', label: 'PUR #', className: 'font-mono text-xs' },
     { key: 'date', label: 'Date', render: v => date(v) },
     { key: 'supplier_name', label: 'Supplier', render: v => v || 'Unknown' },
-    { key: 'invoice_number', label: 'Invoice', render: v => v || '—' },
+    { key: 'invoice_number', label: 'Invoice', render: v => v || '—', hideOnMobile: true },
     { key: 'total_amount', label: 'Total', render: v => <span className="font-semibold">{currency(v)}</span> },
-    { key: 'paid_amount', label: 'Paid', render: v => <span className="text-green-600">{currency(v)}</span> },
+    { key: 'paid_amount', label: 'Paid', render: v => <span className="text-green-600">{currency(v)}</span>, hideOnMobile: true },
     { key: 'pending_amount', label: 'Pending', render: v => parseFloat(v) > 0 ? <span className="text-red-600 font-medium">{currency(v)}</span> : '—' },
     { key: 'payment_status', label: 'Status', render: v => <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusBg[v] || ''}`}>{v}</span> },
     { key: 'actions', label: '', render: (_, row) => (
