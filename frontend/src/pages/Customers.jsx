@@ -84,8 +84,8 @@ export default function Customers() {
     { key: 'vehicle_number', label: 'Vehicle', render: (v, row) => v ? (
       <div className="flex items-center gap-1"><Car size={12} className="text-gray-400" /><span>{v}</span>{row.vehicle_model && <span className="text-xs text-gray-400">({row.vehicle_model})</span>}</div>
     ) : '—' },
-    { key: 'total_billing', label: 'Total Billing', render: v => <span className="font-medium">{currency(v)}</span> },
-    { key: 'total_paid', label: 'Paid', render: v => <span className="text-green-600 font-medium">{currency(v)}</span> },
+    { key: 'total_billing', label: 'Total Billing', render: v => <span className="font-medium">{currency(v)}</span>, hideOnMobile: true },
+    { key: 'total_paid', label: 'Paid', render: v => <span className="text-green-600 font-medium">{currency(v)}</span>, hideOnMobile: true },
     { key: 'total_pending', label: 'Pending', render: v => parseFloat(v) > 0 ? <span className="text-red-600 font-medium">{currency(v)}</span> : <span className="text-gray-400">{currency(0)}</span> },
     { key: 'last_payment_date', label: 'Last Activity', render: v => date(v) },
     { key: 'actions', label: '', render: (_, row) => (
