@@ -306,7 +306,7 @@ export default function Expenses() {
 
       {/* Method split summary */}
       {byMethod.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {METHODS.map(method => {
             const row = byMethod.find(r => r.payment_method === method);
             const amt = row?.total || 0;
