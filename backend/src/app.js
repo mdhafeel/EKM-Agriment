@@ -32,9 +32,13 @@ const FRONTEND_DIST = process.env.FRONTEND_DIST
 
 if (fs.existsSync(FRONTEND_DIST)) {
   app.use(express.static(FRONTEND_DIST));
-  // SPA fallback — all non-API routes return index.html
+  // SPA fallback — return index.html for all non-API, non-file routes
   app.get('*', (req, res, next) => {
+    // Skip API routes and uploads
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
+    // Skip requests for static files with extensions (images, fonts, etc.)
+    if (/\.\w{2,5}$/.test(req.path)) return res.status(404).send('Not found');
+    // All other routes → SPA index.html
     res.sendFile(path.join(FRONTEND_DIST, 'index.html'));
   });
 } else {
